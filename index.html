@@ -95,96 +95,109 @@
   <div class="found-groups" id="foundGroups"></div>
   <div class="final-message" id="finalMessage"></div>
 
-  <script>
-    const grupos = [
-      ["Paraty", "Cunha", "Feira", "Sorvetão"],
-      ["Hamilton", "Quebra-cabeças", "Cozinhar", "Animações"],
-      ["Flores", "Mini presentes", "Planejar dates", "Emojis"],
-      ["Amor", "Diálogo", "Cuidado", "Construção"]
-    ];
+ <script>
+  const grupos = [
+    ["Paraty", "Cunha", "Feira", "Sorvetão"],
+    ["Hamilton", "Quebra-cabeças", "Cozinhar", "Animações"],
+    ["Flores", "Mini presentes", "Planejar dates", "Emojis"],
+    ["Amor", "Diálogo", "Cuidado", "Construção"]
+  ];
 
-    const todasPalavras = grupos.flat();
+  let todasPalavras = grupos.flat().slice(); // cópia real do array
+  shuffle(todasPalavras);
 
-    function shuffle(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+  const grid = document.getElementById('grid');
+  const selectedWords = new Set();
+  const foundGroups = [];
+  let attempts = 0;
+
+  // Embaralhador
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+  }
+
+  // Monta grade de palavras
+  todasPalavras.forEach(wordText => {
+    const wordEl = document.createElement('div');
+    wordEl.className = 'word';
+    wordEl.textContent = wordText;
+    wordEl.addEventListener('click', () => {
+      if (wordEl.classList.contains('found')) return;
+      wordEl.classList.toggle('selected');
+      if (selectedWords.has(wordText)) {
+        selectedWords.delete(wordText);
+      } else {
+        selectedWords.add(wordText);
+      }
+    });
+    grid.appendChild(wordEl);
+  });
+
+  function checkConnection() {
+    const resultEl = document.getElementById('result');
+    const attemptsEl = document.getElementById('attempts');
+
+    if (selectedWords.size !== 4) {
+      resultEl.textContent = "Selecione exatamente 4 palavras.";
+      return;
+    }
+
+    const selection = Array.from(selectedWords);
+    const selectionSorted = [...selection].sort();
+
+    let groupFound = null;
+
+    for (const group of grupos) {
+      const sortedGroup = [...group].sort();
+      const isSameGroup = JSON.stringify(sortedGroup) === JSON.stringify(selectionSorted);
+
+      if (isSameGroup && !foundGroups.some(g => JSON.stringify([...g].sort()) === JSON.stringify(selectionSorted))) {
+        groupFound = group;
+        break;
       }
     }
 
-    shuffle(todasPalavras);
+    attempts++;
+    attemptsEl.textContent = `Tentativas: ${attempts}`;
 
-    const grid = document.getElementById('grid');
-    const selectedWords = new Set();
-    const foundGroups = [];
-    let attempts = 0;
+    if (groupFound) {
+      foundGroups.push(groupFound);
+      highlightGroup(groupFound);
+      resultEl.textContent = "Você encontrou um grupo correto! 💕";
+    } else {
+      resultEl.textContent = "Hmm... esse grupo não está certo ainda. Tente novamente!";
+    }
 
-    todasPalavras.forEach(wordText => {
-      const wordEl = document.createElement('div');
-      wordEl.className = 'word';
-      wordEl.textContent = wordText;
-      wordEl.addEventListener('click', () => {
-        if (wordEl.classList.contains('found')) return;
-        wordEl.classList.toggle('selected');
-        if (selectedWords.has(wordText)) {
-          selectedWords.delete(wordText);
-        } else {
-          selectedWords.add(wordText);
-        }
-      });
-      grid.appendChild(wordEl);
+    selectedWords.clear();
+    document.querySelectorAll('.word').forEach(w => w.classList.remove('selected'));
+
+    if (foundGroups.length === grupos.length) {
+      document.getElementById('finalMessage').textContent =
+        "Feliz dia dos namorados! Amo você meu benzinho 💛 Lena";
+    }
+  }
+
+  function highlightGroup(group) {
+    const groupDiv = document.createElement('div');
+    groupDiv.classList.add('found-group');
+
+    group.forEach(wordText => {
+      const wordEl = Array.from(document.querySelectorAll('.word')).find(el => el.textContent === wordText);
+      if (wordEl) wordEl.classList.add('found');
+
+      const clone = document.createElement('div');
+      clone.className = 'word';
+      clone.textContent = wordText;
+      groupDiv.appendChild(clone);
     });
 
-    function checkConnection() {
-      if (selectedWords.size !== 4) {
-        document.getElementById('result').textContent = "Selecione exatamente 4 palavras.";
-        return;
-      }
+    const container = document.getElementById('foundGroups');
+    container.insertBefore(groupDiv, container.firstChild);
+  }
+</script>
 
-      const selection = Array.from(selectedWords);
-      let groupFound = null;
-
-      grupos.forEach(group => {
-        if (group.every(word => selection.includes(word))) {
-          groupFound = group;
-        }
-      });
-
-      attempts++;
-      document.getElementById('attempts').textContent = `Tentativas: ${attempts}`;
-
-      if (groupFound && !foundGroups.includes(groupFound)) {
-        foundGroups.push(groupFound);
-        highlightGroup(groupFound);
-        document.getElementById('result').textContent = "Você encontrou um grupo correto! 💕";
-      } else {
-        document.getElementById('result').textContent = "Hmm... esse grupo não está certo ainda. Tente novamente!";
-      }
-
-      selectedWords.clear();
-      document.querySelectorAll('.word').forEach(w => w.classList.remove('selected'));
-
-      if (foundGroups.length === grupos.length) {
-        document.getElementById('finalMessage').textContent =
-          "Feliz dia dos namorados! Amo você meu benzinho 💛 Lena";
-      }
-    }
-
-    function highlightGroup(group) {
-      const groupDiv = document.createElement('div');
-      groupDiv.classList.add('found-group');
-      group.forEach(wordText => {
-        const wordEl = Array.from(document.querySelectorAll('.word')).find(el => el.textContent === wordText);
-        if (wordEl) wordEl.classList.add('found');
-
-        const clone = document.createElement('div');
-        clone.className = 'word';
-        clone.textContent = wordText;
-        groupDiv.appendChild(clone);
-      });
-      const container = document.getElementById('foundGroups');
-      container.insertBefore(groupDiv, container.firstChild);
-    }
-  </script>
 </body>
 </html>
