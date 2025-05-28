@@ -57,6 +57,7 @@
       margin-top: 20px;
       font-size: 18px;
       color: #10b981;
+      text-align: center;
     }
     .found-groups {
       margin-top: 30px;
@@ -76,55 +77,63 @@
       background-color: #bbf7d0;
       border-color: #34d399;
     }
+    .final-message {
+      margin-top: 40px;
+      font-size: 22px;
+      color: #dc2626;
+      text-align: center;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
   <h1>Connections – Versão do Amor 💛</h1>
-  <div class="grid" id="grid">
-    <div class="word">Paraty</div>
-    <div class="word">Cunha</div>
-    <div class="word">Feira</div>
-    <div class="word">Sorvetão</div>
-    <div class="word">Hamilton</div>
-    <div class="word">Quebra-cabeças</div>
-    <div class="word">Cozinhar</div>
-    <div class="word">Animações</div>
-    <div class="word">Flores</div>
-    <div class="word">Mini presentes</div>
-    <div class="word">Planejar dates</div>
-    <div class="word">Emojis</div>
-    <div class="word">Amor</div>
-    <div class="word">Diálogo</div>
-    <div class="word">Cuidado</div>
-    <div class="word">Construção</div>
-  </div>
+  <div class="grid" id="grid"></div>
   <button onclick="checkConnection()">Verificar Seleção</button>
   <div class="result" id="result"></div>
+  <div class="result" id="attempts"></div>
   <div class="found-groups" id="foundGroups"></div>
+  <div class="final-message" id="finalMessage"></div>
 
   <script>
-    const words = document.querySelectorAll('.word');
-    const selectedWords = new Set();
-    const foundGroups = [];
-
-    words.forEach(word => {
-      word.addEventListener('click', () => {
-        if (word.classList.contains('found')) return;
-        word.classList.toggle('selected');
-        if (selectedWords.has(word.textContent)) {
-          selectedWords.delete(word.textContent);
-        } else {
-          selectedWords.add(word.textContent);
-        }
-      });
-    });
-
     const grupos = [
       ["Paraty", "Cunha", "Feira", "Sorvetão"],
       ["Hamilton", "Quebra-cabeças", "Cozinhar", "Animações"],
       ["Flores", "Mini presentes", "Planejar dates", "Emojis"],
       ["Amor", "Diálogo", "Cuidado", "Construção"]
     ];
+
+    const todasPalavras = grupos.flat();
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    shuffle(todasPalavras);
+
+    const grid = document.getElementById('grid');
+    const selectedWords = new Set();
+    const foundGroups = [];
+    let attempts = 0;
+
+    todasPalavras.forEach(wordText => {
+      const wordEl = document.createElement('div');
+      wordEl.className = 'word';
+      wordEl.textContent = wordText;
+      wordEl.addEventListener('click', () => {
+        if (wordEl.classList.contains('found')) return;
+        wordEl.classList.toggle('selected');
+        if (selectedWords.has(wordText)) {
+          selectedWords.delete(wordText);
+        } else {
+          selectedWords.add(wordText);
+        }
+      });
+      grid.appendChild(wordEl);
+    });
 
     function checkConnection() {
       if (selectedWords.size !== 4) {
@@ -141,6 +150,9 @@
         }
       });
 
+      attempts++;
+      document.getElementById('attempts').textContent = `Tentativas: ${attempts}`;
+
       if (groupFound && !foundGroups.includes(groupFound)) {
         foundGroups.push(groupFound);
         highlightGroup(groupFound);
@@ -150,15 +162,19 @@
       }
 
       selectedWords.clear();
-      words.forEach(w => w.classList.remove('selected'));
+      document.querySelectorAll('.word').forEach(w => w.classList.remove('selected'));
+
+      if (foundGroups.length === grupos.length) {
+        document.getElementById('finalMessage').textContent =
+          "Feliz dia dos namorados! Amo você meu benzinho 💛 Lena";
+      }
     }
 
     function highlightGroup(group) {
       const groupDiv = document.createElement('div');
       groupDiv.classList.add('found-group');
       group.forEach(wordText => {
-        const wordEl = document.querySelector(`.word:nth-child(n):not(.found):not(.selected):contains('${wordText}')`) ||
-                        Array.from(document.querySelectorAll('.word')).find(el => el.textContent === wordText);
+        const wordEl = Array.from(document.querySelectorAll('.word')).find(el => el.textContent === wordText);
         if (wordEl) wordEl.classList.add('found');
 
         const clone = document.createElement('div');
