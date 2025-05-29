@@ -1,91 +1,129 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cruzadinhas HD</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cruzadinha Especial</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: white;
-      padding: 20px;
+      background-color: #fefefe;
+      background-image: url('https://www.transparenttextures.com/patterns/white-wall-3.png');
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: flex-start;
+      padding: 20px;
     }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(19, 30px);
-      gap: 2px;
-      margin-bottom: 20px;
+    h1 {
+      color: #f59e0b;
+      text-align: center;
     }
-
-    .cell {
+    table {
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    td {
       width: 30px;
       height: 30px;
-      border: 1px solid #000;
+      border: 1px solid #aaa;
       text-align: center;
-      text-transform: uppercase;
-      font-size: 16px;
-      font-weight: bold;
-      background-color: white;
-      position: relative;
+      vertical-align: middle;
+      padding: 0;
     }
-
-    .cell input {
+    input {
       width: 100%;
       height: 100%;
       border: none;
+      text-transform: uppercase;
       text-align: center;
       font-size: 16px;
-      text-transform: uppercase;
-      font-weight: bold;
+      background-color: #fff;
     }
-
-    .cell input:focus {
-      outline: none;
-      background-color: #e6f7ff;
+    input:focus {
+      outline: 2px solid #facc15;
     }
-
-    .cell.inactive {
-      border: none;
+    .empty {
       background-color: transparent;
+      border: none;
     }
-
-    .cell-number {
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      font-size: 10px;
-      color: gray;
-    }
-
-    #message {
-      font-size: 18px;
-      margin-top: 10px;
-      max-width: 600px;
-      text-align: center;
-    }
-
     .error {
-      background-color: #f8d7da;
+      background-color: #fca5a5;
     }
-
-    .btn-voltar {
-      margin-bottom: 20px;
+    .hint-container {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 30px;
+      margin-top: 20px;
+      max-width: 1000px;
+    }
+    .hint-group {
+      flex: 1;
+      min-width: 300px;
+    }
+    .hint-group h3 {
+      margin-bottom: 10px;
+      color: #92400e;
+    }
+    .btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #fef3c7;
+      border: 2px solid #facc15;
+      border-radius: 8px;
+      color: #92400e;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .message {
+      margin-top: 20px;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <button class="btn-voltar" onclick="window.location.href='index.html'">Voltar</button>
-  <h1>Cruzadinhas HD 💛</h1>
-  <div class="grid" id="grid"></div>
-  <button onclick="checkAnswers()">Verificar</button>
-  <div id="message"></div>
+  <h1>Cruzadinha do Amor 💛</h1>
+  <button class="btn" onclick="window.location.href='index.html'">⬅ Voltar</button>
+  <table id="grid"></table>
 
-  <script>
-    const layout = `
+  <button class="btn" onclick="checkAnswers()">Verificar Respostas</button>
+  <div class="message" id="message"></div>
+
+  <div class="hint-container">
+    <div class="hint-group">
+      <h3>Verticais</h3>
+      <ol>
+        <li>sorveteria</li>
+        <li>primeiro encontro</li>
+        <li>uma refeição</li>
+        <li>sempre fazemos questão</li>
+        <li>você odiava e está aprendendo a gostar</li>
+        <li>primeiro mergulho no mar</li>
+        <li>pretin</li>
+        <li>sempre tinha nos nossos primeiros encontros</li>
+        <li>brancas e amarelas</li>
+        <li>nossa sobremesa</li>
+        <li>primeiro vício que te dei</li>
+      </ol>
+    </div>
+    <div class="hint-group">
+      <h3>Horizontais</h3>
+      <ol>
+        <li>passatempo</li>
+        <li>uma cidade</li>
+        <li>filmes</li>
+        <li>era do ficante</li>
+        <li>encaixa certinho</li>
+        <li>sempre tem no bom dia</li>
+        <li>seu perigo noturno</li>
+        <li>atos de serviço preferido</li>
+      </ol>
+    </div>
+  </div>
+
+ <script>
+  const layout = `
 0000000010100000000
 0000000010100000000
 0000000010100000000
@@ -101,118 +139,85 @@
 0000101111111110101
 0100101000000100101
 1111111111100111100
-0100101000100000010
-0100100011111100010
-0100000001000000000
-0100000111111100000
-0100000010000000000
+0100101001000000100
+0100100011111100100
+0100000000100000000
+0100000111111000000
+0100000000100000000
 0100000111111111000
-0000000010000000000`.trim().split('\n');
+0000000000100000000
+  `.trim().split("\n").map(row => row.split(""));
 
-    const answers = `
-        ..........SORVETAO.........
-        ..........GYMDATE..........
-        ..........CAFE.............
-        ..........DA...............
-        ..........MANHA............
-        ......QUEBRACABECA.........
-        FEIRA..............CUNHASP.
-        ......DAVI.....PARATY......
-        ..........MUSICA.....HELENA
-        ..........FLORES.....HELENA
-        ..........ANIMACOES..HELENA
-        ....HAMILTON.....HELENA....
-        ....HAMILTON.....HELENA....
-        .MOCHILHINHA.....HELENA....
-        SORVETES...AMOR............
-        .SORVETES...AMOR...........
-        .SORVETES...AMOR...........
-        ..........EMOJIS...........
-        ..........HELENA...........
-        ..........COZINHAR.........
-        ..........COZINHAR.........`.trim().split('\n');
+  const answers = `
+0000000S0R0V0E0T0A0
+0000000O0G0Y0M0D0A0
+0000000R0M0A0A0T0T0
+Q0U0E0B0R0A0C0A0B0E
+0000000Ç00000000000
+0000000F0O0000S0000
+0000000E000F0C0U0N0
+0000000D0D0E000R0A0
+0000000A0A0I0P000R0
+0000M0M0V0R0R0F0A00
+0000U0A0N0I0M0A0C0O
+0000E0S000L0T0S0Y00
+M0O0C0H0I0L0H0I0N0H
+A0000M0O0R000000000
+0000R0C0A0A0000E000
+0000V0A0000E0M0O0J0
+0000I000000000S0000
+0000T0H0E0L0E0N0A00
+0000E0000T000000000
+0000S0C0O0Z0I0N0H0A
+0000000000N00000000
+  `.trim().split("\n").map(row => row.split(""));
 
-    const clues = {
-      '1;9': 1,
-      '1;11': 2,
-      '6;7': 3,
-      '7;2': 4,
-      '8;14': 5,
-      '9;11': 6,
-      '9;13': 7,
-      '9;19': 8,
-      '10;9': 9,
-      '12;5': 10,
-      '12;17': 11,
-      '13;7': 12,
-      '14;2': 13,
-      '15;1': 14,
-      '15;10': 15,
-      '15;14': 16,
-      '17;9': 17,
-      '19;8': 18,
-      '21;9': 19
-    }
-
-    const grid = document.getElementById('grid');
-
-    layout.forEach((row, i) => {
-      row.split('').forEach((char, j) => {
-        const cell = document.createElement('div');
-        cell.classList.add('cell');
-        if (char === '1') {
-          const input = document.createElement('input');
-          input.maxLength = 1;
-          input.dataset.row = i;
-          input.dataset.col = j;
-          input.addEventListener('input', (e) => {
-            e.target.value = e.target.value.toUpperCase();
-            const next = e.target.nextElementSibling;
-            if (next && next.tagName === 'INPUT') next.focus();
-          });
-          cell.appendChild(input);
-
-          const clueKey = `${i + 1};${j + 1}`;
-          if (clues[clueKey]) {
-            const clueNumber = document.createElement('div');
-            clueNumber.classList.add('cell-number');
-            clueNumber.textContent = clues[clueKey];
-            cell.appendChild(clueNumber);
-          }
-        } else {
-          cell.classList.add('inactive');
-        }
-        grid.appendChild(cell);
-      });
-    });
-
-    function checkAnswers() {
-      let correct = true;
-      const cells = grid.querySelectorAll('.cell');
-      cells.forEach((cell, index) => {
-        const input = cell.querySelector('input');
-        if (!input) return;
-        const row = parseInt(input.dataset.row);
-        const col = parseInt(input.dataset.col);
-        const expected = answers[row][col].toUpperCase();
-        const typed = input.value.toUpperCase();
-        if (typed === expected) {
-          input.classList.remove('error');
-        } else {
-          input.classList.add('error');
-          correct = false;
-        }
-      });
-
-      const msg = document.getElementById('message');
-      if (correct) {
-        msg.innerHTML = `Parabéns, você completou os joguinhos HD (Helena e Davi) especial dia dos namorados! 💛<br>Que nosso amor nunca deixe de ser divertido, obrigada por esses 6 meses 🌻<br>"A vida antes era um borrão, mas agr cm você eu vejo em HD"<br>Com amor, Leninha.`;
-        msg.style.color = 'green';
+  const table = document.getElementById("grid");
+  layout.forEach((row, i) => {
+    const tr = document.createElement("tr");
+    row.forEach((cell, j) => {
+      const td = document.createElement("td");
+      if (cell === "1") {
+        const input = document.createElement("input");
+        input.maxLength = 1;
+        input.dataset.row = i;
+        input.dataset.col = j;
+        input.addEventListener("input", (e) => {
+          e.target.value = e.target.value.toUpperCase();
+        });
+        td.appendChild(input);
       } else {
-        msg.textContent = 'Há alguns erros, revise suas respostas!';
-        msg.style.color = 'red';
+        td.className = "empty";
       }
+      tr.appendChild(td);
+    });
+    table.appendChild(tr);
+  });
+
+  function checkAnswers() {
+    const inputs = table.querySelectorAll("input");
+    let correct = true;
+    inputs.forEach(input => {
+      const row = input.dataset.row;
+      const col = input.dataset.col;
+      const expected = answers[row][col].toUpperCase();
+      const value = input.value.toUpperCase();
+      if (value !== expected) {
+        input.classList.add("error");
+        correct = false;
+      } else {
+        input.classList.remove("error");
+      }
+    });
+    const message = document.getElementById("message");
+    if (correct) {
+      message.textContent = "Parabéns, você completou os joguinhos HD (Helena e Davi) especial dia dos namorados! Que nosso amor nunca deixe de ser divertido, obrigada por esses 6 meses 🌻 💛 \"A vida antes era um borrão, mas agr cm você eu vejo em HD\", Com amor Leninha.";
+      message.style.color = "green";
+    } else {
+      message.textContent = "Algumas respostas estão incorretas. Tente novamente!";
+      message.style.color = "red";
     }
-  </script>
+  }
+</script>
 </body>
 </html>
