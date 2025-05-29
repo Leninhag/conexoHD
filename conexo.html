@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conexo</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #fefefe;
+      background-image: url('https://www.transparenttextures.com/patterns/white-wall-3.png');
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      color: #f59e0b;
+      margin-bottom: 20px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      max-width: 400px;
+      margin: 0 auto 20px;
+    }
+    .word-box {
+      padding: 15px;
+      background-color: #fff8dc;
+      border: 2px solid #facc15;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .word-box.selected {
+      background-color: #fde68a;
+    }
+    .word-box.correct {
+      background-color: #bbf7d0;
+    }
+    .word-box.incorrect {
+      background-color: #fecaca;
+    }
+    .found-groups {
+      max-width: 400px;
+      margin: 20px auto;
+      text-align: left;
+    }
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Conexo 💛</h1>
+  <div class="grid" id="grid"></div>
+  <p>Tentativas: <span id="attempts">0</span></p>
+  <div class="found-groups" id="found-groups"></div>
+  <script>
+    const words = [
+      "Paraty", "Cunha", "Feira", "Sorvetão",
+      "Hamilton", "Quebra-cabeças", "Cozinhar", "Animações",
+      "Flores", "Mini presentes", "Planejar dates", "Emojis",
+      "Amor", "Diálogo", "Cuidado", "Construção"
+    ];
+
+    const groups = {
+      "Lugares": ["Paraty", "Cunha", "Feira", "Sorvetão"],
+      "Em casa": ["Hamilton", "Quebra-cabeças", "Cozinhar", "Animações"],
+      "Fofuras": ["Flores", "Mini presentes", "Planejar dates", "Emojis"],
+      "Cultura / Coisas que assistem juntos": ["Amor", "Diálogo", "Cuidado", "Construção"]
+    };
+
+    const shuffled = [...words].sort(() => Math.random() - 0.5);
+    const grid = document.getElementById("grid");
+    const attemptsDisplay = document.getElementById("attempts");
+    const foundGroupsDiv = document.getElementById("found-groups");
+
+    let selected = [];
+    let attempts = 0;
+    let foundGroups = [];
+
+    function renderGrid() {
+      grid.innerHTML = "";
+      shuffled.forEach(word => {
+        const div = document.createElement("div");
+        div.className = "word-box";
+        div.textContent = word;
+        div.onclick = () => toggleWord(word, div);
+        grid.appendChild(div);
+      });
+    }
+
+    function toggleWord(word, div) {
+      if (div.classList.contains("correct")) return;
+
+      if (selected.includes(word)) {
+        selected = selected.filter(w => w !== word);
+        div.classList.remove("selected");
+      } else {
+        selected.push(word);
+        div.classList.add("selected");
+      }
+
+      if (selected.length === 4) {
+        attempts++;
+        attemptsDisplay.textContent = attempts;
+
+        let matchedGroup = null;
+        for (let groupName in groups) {
+          const groupWords = groups[groupName];
+          if (groupWords.every(w => selected.includes(w))) {
+            matchedGroup = groupName;
+            break;
+          }
+        }
+
+        const boxes = Array.from(document.getElementsByClassName("word-box"));
+        if (matchedGroup && !foundGroups.includes(matchedGroup)) {
+          boxes.forEach(box => {
+            if (selected.includes(box.textContent)) {
+              box.classList.remove("selected");
+              box.classList.add("correct");
+            }
+          });
+          foundGroups.push(matchedGroup);
+          const groupDiv = document.createElement("div");
+          groupDiv.textContent = `Você encontrou o grupo "${matchedGroup}" 💕`;
+          foundGroupsDiv.appendChild(groupDiv);
+        } else {
+          boxes.forEach(box => {
+            if (selected.includes(box.textContent)) {
+              box.classList.add("incorrect");
+              setTimeout(() => box.classList.remove("incorrect"), 500);
+              box.classList.remove("selected");
+            }
+          });
+        }
+
+        selected = [];
+
+        if (foundGroups.length === 4) {
+          const message = document.createElement("h2");
+          message.textContent = "Feliz dia dos namorados! Amo você meu benzinho 💛 Lena";
+          foundGroupsDiv.appendChild(message);
+        }
+      }
+    }
+
+    renderGrid();
+  </script>
+</body>
+</html>
