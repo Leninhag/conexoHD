@@ -3,90 +3,130 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cruzadinhas do Amor</title>
+  <title>Cruzadinha do Amor</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
       background-color: #fefefe;
       background-image: url('https://www.transparenttextures.com/patterns/white-wall-3.png');
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      margin: 0;
       padding: 20px;
-    }
-
-    h1 {
-      color: #f59e0b;
-      font-size: 2rem;
-      margin-bottom: 10px;
       text-align: center;
     }
-
-    .crossword-image {
-      max-width: 100%;
-      height: auto;
-      margin-bottom: 30px;
+    h1 {
+      color: #f59e0b;
     }
-
-    .hints {
-      max-width: 700px;
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 20px;
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(20, 30px);
+      justify-content: center;
+      gap: 2px;
+      margin: 20px 0;
     }
-
-    .hints div {
-      flex: 1;
-      min-width: 300px;
+    input {
+      width: 30px;
+      height: 30px;
+      text-transform: uppercase;
+      text-align: center;
+      font-size: 16px;
     }
-
-    .hints h2 {
-      color: #d97706;
-      margin-bottom: 10px;
-      font-size: 1.2rem;
+    .black {
+      background-color: black;
+      pointer-events: none;
     }
-
-    ul {
-      padding-left: 20px;
+    .clues {
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: left;
+    }
+    .clues h3 {
+      margin-top: 20px;
+    }
+    .back-btn {
+      margin-top: 20px;
+    }
+    .btn {
+      padding: 10px 20px;
+      font-size: 1rem;
+      background-color: #fef3c7;
+      border: 2px solid #facc15;
+      border-radius: 8px;
+      color: #92400e;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .btn:hover {
+      background-color: #fde68a;
     }
   </style>
 </head>
 <body>
-  <h1>Cruzadinhas do Amor 💛</h1>
-  <img class="crossword-image" src="/mnt/data/88c0e8e2-caf1-41a2-b502-d226e036e8f3.png" alt="Palavras Cruzadas do Amor">
+  <h1>Cruzadinha do Amor 💛</h1>
 
-  <div class="hints">
-    <div>
-      <h2>Vertical</h2>
-      <ul>
-        <li>1. sorveteria</li>
-        <li>2. primeiro encontro</li>
-        <li>3. uma refeição</li>
-        <li>5. sempre fazemos questão</li>
-        <li>6. você odiava e está aprendendo a gostar</li>
-        <li>8. primeiro mergulho no mar</li>
-        <li>9. pretin</li>
-        <li>10. sempre tinha nos nossos primeiros encontros</li>
-        <li>11. brancas e amarelas</li>
-        <li>13. nossa sobremesa</li>
-        <li>15. primeiro vício que te dei</li>
-      </ul>
-    </div>
-    <div>
-      <h2>Horizontal</h2>
-      <ul>
-        <li>4. passatempo</li>
-        <li>7. uma cidade</li>
-        <li>12. filmes</li>
-        <li>14. era do ficante</li>
-        <li>16. encaixa certinho</li>
-        <li>17. sempre tem no bom dia</li>
-        <li>18. seu perigo noturno</li>
-        <li>19. atos de serviço preferido</li>
-      </ul>
-    </div>
+  <div class="grid" id="crossword"></div>
+
+  <div class="clues">
+    <h3>Verticais</h3>
+    <ol>
+      <li>Sorveteria</li>
+      <li>Primeiro encontro</li>
+      <li>Uma refeição</li>
+      <li>Sempre fazemos questão</li>
+      <li>Você odiava e está aprendendo a gostar</li>
+      <li>Primeiro mergulho no mar</li>
+      <li>PretiN</li>
+      <li>Sempre tinha nos nossos primeiros encontros</li>
+      <li>Brancas e amarelas</li>
+      <li>Nossa sobremesa</li>
+      <li>Primeiro vício que te dei</li>
+    </ol>
+    <h3>Horizontais</h3>
+    <ol>
+      <li>Passatempo</li>
+      <li>Uma cidade</li>
+      <li>Filmes</li>
+      <li>Era do ficante</li>
+      <li>Encaixa certinho</li>
+      <li>Sempre tem no bom dia</li>
+      <li>Seu perigo noturno</li>
+      <li>Atos de serviço preferido</li>
+    </ol>
   </div>
+
+  <div class="back-btn">
+    <a class="btn" href="index.html">Voltar</a>
+  </div>
+
+  <script>
+    const gridLayout = [
+      // 20x20 grid layout, 0 = empty, 1 = input, 2 = black box
+      // For brevity, we'll create a simplified crossword layout
+      // Replace with real layout when known
+      "00000000000000000000",
+      "00000000111110000000",
+      "00001111100000111100",
+      "00001000100010000100",
+      "00001111100111111100",
+      "00000000100010000100",
+      "00111111111110000000",
+      "00100010000010000000",
+      "11111111100001111100",
+      "00001000000000000100",
+      "00001111111111111100",
+      "00000000000000000000"
+    ];
+
+    const crossword = document.getElementById("crossword");
+    gridLayout.forEach(row => {
+      [...row].forEach(cell => {
+        const input = document.createElement("input");
+        if (cell === "0") {
+          input.className = "black";
+          input.disabled = true;
+        }
+        crossword.appendChild(input);
+      });
+    });
+  </script>
 </body>
 </html>
