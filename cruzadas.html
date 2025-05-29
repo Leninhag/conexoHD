@@ -26,10 +26,11 @@
     td {
       width: 30px;
       height: 30px;
-      border: 1px solid #aaa;
+      border: 1px solid #999;
       text-align: center;
       vertical-align: middle;
       padding: 0;
+      position: relative;
     }
     input {
       width: 100%;
@@ -49,6 +50,14 @@
     }
     .error {
       background-color: #fca5a5;
+    }
+    .cell-number {
+      position: absolute;
+      top: 1px;
+      left: 2px;
+      font-size: 10px;
+      color: #555;
+      font-weight: bold;
     }
     .hint-container {
       display: flex;
@@ -122,8 +131,8 @@
     </div>
   </div>
 
- <script>
-  const layout = `
+  <script>
+    const layout = `
 0000000010100000000
 0000000010100000000
 0000000010100000000
@@ -146,78 +155,95 @@
 0100000000100000000
 0100000111111111000
 0000000000100000000
-  `.trim().split("\n").map(row => row.split(""));
+    `.trim().split("\n").map(row => row.split(""));
 
-  const answers = `
-00000000s0g000000000000
-00000000o0y000000000000
-00000000r0m000000000000
-00000000v0d000000000000
-00000000e0a000000000000
-000000c0t0t000000000000
-00quebracabeça00000000
-000000f0o0000s00000000
-000000e000f0cunhasp000
-000000d0d0e000r0000a00
-000000a0a0i000p0000r00
-000m0m0v0r000r00f0a000
-000u0animacoes0l0t0000
-s00s0n0000000s00o0y000
-mochilhinha00amor00000
-0r00c0a00a000000e00000
-v00a000emojiss00s00000
-e0000000000i0000000000
-0t0000helen00000000000
-0e000000000t0000000000
+    const answers = `
+0000000SORVETAO0000
+0000000G000Y0000000
+0000000Y000M0000000
+0000000M000D0000000
+0000000A000A0000000
+0000010T000T0000000
+QUEBRACABECAS000000
+000000E000000S00000
+000000I000FANIMACOES
+000000R000M000000AR
+000000A000I000000C
+0000SURPRESA0000A
+0000FEEEEEEEEE0M0O
+0C000A0000000000R0
+CUNHASPARATYDAVI000
+0H000I000D000000N00
+0I000000FILMES000D0
+0N0000000E000000000
+0H0000EMOJIS0000000
+0A0000000L000000000
+0M0000HAMILTON00000
+0000000A00000000000
+    `.trim().split("\n").map(r => r.split(""));
 
-  `.trim().split("\n").map(row => row.split(""));
+    const clueNumbers = {
+      "0,7": 1, "6,0": 2, "0,8": 3, "1,1": 4,
+      "0,9": 5, "2,1": 6, "0,10": 7, "3,1": 8,
+      "0,11": 9, "4,1": 10, "0,12": 11, "5,1": 12,
+      "0,13": 13, "6,1": 14, "0,14": 15, "7,1": 16,
+      "0,15": 17, "0,16": 18, "9,15": 19
+    };
 
-  const table = document.getElementById("grid");
-  layout.forEach((row, i) => {
-    const tr = document.createElement("tr");
-    row.forEach((cell, j) => {
-      const td = document.createElement("td");
-      if (cell === "1") {
-        const input = document.createElement("input");
-        input.maxLength = 1;
-        input.dataset.row = i;
-        input.dataset.col = j;
-        input.addEventListener("input", (e) => {
-          e.target.value = e.target.value.toUpperCase();
-        });
-        td.appendChild(input);
-      } else {
-        td.className = "empty";
-      }
-      tr.appendChild(td);
+    const table = document.getElementById("grid");
+    layout.forEach((row, i) => {
+      const tr = document.createElement("tr");
+      row.forEach((cell, j) => {
+        const td = document.createElement("td");
+        if (cell === "1") {
+          const input = document.createElement("input");
+          input.maxLength = 1;
+          input.dataset.row = i;
+          input.dataset.col = j;
+          input.addEventListener("input", (e) => {
+            e.target.value = e.target.value.toUpperCase();
+          });
+          td.appendChild(input);
+
+          const key = `${i},${j}`;
+          if (clueNumbers[key]) {
+            const span = document.createElement("span");
+            span.className = "cell-number";
+            span.textContent = clueNumbers[key];
+            td.appendChild(span);
+          }
+        } else {
+          td.className = "empty";
+        }
+        tr.appendChild(td);
+      });
+      table.appendChild(tr);
     });
-    table.appendChild(tr);
-  });
 
-  function checkAnswers() {
-    const inputs = table.querySelectorAll("input");
-    let correct = true;
-    inputs.forEach(input => {
-      const row = input.dataset.row;
-      const col = input.dataset.col;
-      const expected = answers[row][col].toUpperCase();
-      const value = input.value.toUpperCase();
-      if (value !== expected) {
-        input.classList.add("error");
-        correct = false;
+    function checkAnswers() {
+      const inputs = table.querySelectorAll("input");
+      let correct = true;
+      inputs.forEach(input => {
+        const row = input.dataset.row;
+        const col = input.dataset.col;
+        const expected = answers[row][col].toUpperCase();
+        const value = input.value.toUpperCase();
+        if (value !== expected) {
+          input.classList.add("error");
+          correct = false;
+        } else {
+          input.classList.remove("error");
+        }
+      });
+      const message = document.getElementById("message");
+      if (correct) {
+        message.textContent = "Parabéns, você completou os joguinhos HD(Helena e Davi) especial dia dos namorados! Que nosso amor nunca deixe de ser divertido, obrigada por esses 6 meses 🌻 💛 \"A vida antes era um borrão, mas agr cm você eu vejo em HD\", Com amor Leninha.";
+        message.style.color = "green";
       } else {
-        input.classList.remove("error");
+        message.textContent = "Algumas respostas estão incorretas. Tente novamente!";
+        message.style.color = "red";
       }
-    });
-    const message = document.getElementById("message");
-    if (correct) {
-      message.textContent = "Parabéns, você completou os joguinhos HD (Helena e Davi) especial dia dos namorados! Que nosso amor nunca deixe de ser divertido, obrigada por esses 6 meses 🌻 💛 \"A vida antes era um borrão, mas agr cm você eu vejo em HD\", Com amor Leninha.";
-      message.style.color = "green";
-    } else {
-      message.textContent = "Algumas respostas estão incorretas. Tente novamente!";
-      message.style.color = "red";
     }
-  }
-</script>
+  </script>
 </body>
 </html>
