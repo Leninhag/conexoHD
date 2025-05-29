@@ -1,126 +1,88 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cruzadinha Especial</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cruzadinhas HD</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #fefefe;
-      background-image: url('https://www.transparenttextures.com/patterns/white-wall-3.png');
+      background-color: white;
+      padding: 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
-      padding: 20px;
     }
-    h1 {
-      color: #f59e0b;
-      text-align: center;
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(19, 30px);
+      gap: 2px;
+      margin-bottom: 20px;
     }
-    table {
-      border-collapse: collapse;
-      margin: 20px 0;
-    }
-    td {
+
+    .cell {
       width: 30px;
       height: 30px;
-      border: 1px solid #aaa;
+      border: 1px solid #000;
       text-align: center;
-      vertical-align: middle;
-      padding: 0;
+      text-transform: uppercase;
+      font-size: 16px;
+      font-weight: bold;
+      background-color: white;
+      position: relative;
     }
-    input {
+
+    .cell input {
       width: 100%;
       height: 100%;
       border: none;
-      text-transform: uppercase;
       text-align: center;
       font-size: 16px;
-      background-color: #fff;
+      text-transform: uppercase;
+      font-weight: bold;
     }
-    input:focus {
-      outline: 2px solid #facc15;
+
+    .cell input:focus {
+      outline: none;
+      background-color: #e6f7ff;
     }
-    .empty {
-      background-color: transparent;
+
+    .cell.inactive {
       border: none;
+      background-color: transparent;
     }
+
+    .cell-number {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      font-size: 10px;
+      color: gray;
+    }
+
+    #message {
+      font-size: 18px;
+      margin-top: 10px;
+      max-width: 600px;
+      text-align: center;
+    }
+
     .error {
-      background-color: #fca5a5;
+      background-color: #f8d7da;
     }
-    .hint-container {
-      display: flex;
-      justify-content: space-around;
-      flex-wrap: wrap;
-      gap: 30px;
-      margin-top: 20px;
-      max-width: 1000px;
-    }
-    .hint-group {
-      flex: 1;
-      min-width: 300px;
-    }
-    .hint-group h3 {
-      margin-bottom: 10px;
-      color: #92400e;
-    }
-    .btn {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background-color: #fef3c7;
-      border: 2px solid #facc15;
-      border-radius: 8px;
-      color: #92400e;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .message {
-      margin-top: 20px;
-      font-weight: bold;
+
+    .btn-voltar {
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>Cruzadinha do Amor 💛</h1>
-  <button class="btn" onclick="window.location.href='index.html'">⬅ Voltar</button>
-  <table id="grid"></table>
-
-  <button class="btn" onclick="checkAnswers()">Verificar Respostas</button>
-  <div class="message" id="message"></div>
-
-  <div class="hint-container">
-    <div class="hint-group">
-      <h3>Verticais</h3>
-      <ol>
-        <li>sorveteria</li>
-        <li>primeiro encontro</li>
-        <li>uma refeição</li>
-        <li>sempre fazemos questão</li>
-        <li>você odiava e está aprendendo a gostar</li>
-        <li>primeiro mergulho no mar</li>
-        <li>pretin</li>
-        <li>sempre tinha nos nossos primeiros encontros</li>
-        <li>brancas e amarelas</li>
-        <li>nossa sobremesa</li>
-        <li>primeiro vício que te dei</li>
-      </ol>
-    </div>
-    <div class="hint-group">
-      <h3>Horizontais</h3>
-      <ol>
-        <li>passatempo</li>
-        <li>uma cidade</li>
-        <li>filmes</li>
-        <li>era do ficante</li>
-        <li>encaixa certinho</li>
-        <li>sempre tem no bom dia</li>
-        <li>seu perigo noturno</li>
-        <li>atos de serviço preferido</li>
-      </ol>
-    </div>
-  </div>
+  <button class="btn-voltar" onclick="window.location.href='index.html'">Voltar</button>
+  <h1>Cruzadinhas HD 💛</h1>
+  <div class="grid" id="grid"></div>
+  <button onclick="checkAnswers()">Verificar</button>
+  <div id="message"></div>
 
   <script>
     const layout = `
@@ -139,88 +101,116 @@
 0000101111111110101
 0100101000000100101
 1111111111100111100
-0100101001000000100
-0100100011111100100
-0100000000100000000
-0100000111111000000
-0100000000100000000
+0100101000100000010
+0100100011111100010
+0100000001000000000
+0100000111111100000
+0100000010000000000
 0100000111111111000
-0000000000100000000
-    `.trim().split("\n").map(row => row.split(""));
+0000000010000000000`.trim().split('\n');
 
     const answers = `
-0000000SORVETAO0000
-0000000G000Y0000000
-0000000Y000M0000000
-0000000M000D0000000
-0000000A000A0000000
-0000010T000T0000000
-QUEBRACABECAS000000
-000000E000000S00000
-000000I000FANIMACOES
-000000R000M000000AR
-000000A000I000000C
-0000SURPRESA0000A
-0000FEEEEEEEEE0M0O
-0C000A0000000000R0
-CUNHASPARATYDAVI000
-0H000I000D000000N00
-0I000000FILMES000D0
-0N0000000E000000000
-0H0000EMOJIS0000000
-0A0000000L000000000
-0M0000HAMILTON00000
-0000000A00000000000
-    `.trim().split("\n").map(r => r.split(""));
+        ..........SORVETAO.........
+        ..........GYMDATE..........
+        ..........CAFE.............
+        ..........DA...............
+        ..........MANHA............
+        ......QUEBRACABECA.........
+        FEIRA..............CUNHASP.
+        ......DAVI.....PARATY......
+        ..........MUSICA.....HELENA
+        ..........FLORES.....HELENA
+        ..........ANIMACOES..HELENA
+        ....HAMILTON.....HELENA....
+        ....HAMILTON.....HELENA....
+        .MOCHILHINHA.....HELENA....
+        SORVETES...AMOR............
+        .SORVETES...AMOR...........
+        .SORVETES...AMOR...........
+        ..........EMOJIS...........
+        ..........HELENA...........
+        ..........COZINHAR.........
+        ..........COZINHAR.........`.trim().split('\n');
 
-    const table = document.getElementById("grid");
+    const clues = {
+      '1;9': 1,
+      '1;11': 2,
+      '6;7': 3,
+      '7;2': 4,
+      '8;14': 5,
+      '9;11': 6,
+      '9;13': 7,
+      '9;19': 8,
+      '10;9': 9,
+      '12;5': 10,
+      '12;17': 11,
+      '13;7': 12,
+      '14;2': 13,
+      '15;1': 14,
+      '15;10': 15,
+      '15;14': 16,
+      '17;9': 17,
+      '19;8': 18,
+      '21;9': 19
+    }
+
+    const grid = document.getElementById('grid');
+
     layout.forEach((row, i) => {
-      const tr = document.createElement("tr");
-      row.forEach((cell, j) => {
-        const td = document.createElement("td");
-        if (cell === "1") {
-          const input = document.createElement("input");
+      row.split('').forEach((char, j) => {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        if (char === '1') {
+          const input = document.createElement('input');
           input.maxLength = 1;
           input.dataset.row = i;
           input.dataset.col = j;
-          input.addEventListener("input", (e) => {
+          input.addEventListener('input', (e) => {
             e.target.value = e.target.value.toUpperCase();
             const next = e.target.nextElementSibling;
-            if (next && next.tagName === 'INPUT') {
-              next.focus();
-            }
+            if (next && next.tagName === 'INPUT') next.focus();
           });
-          td.appendChild(input);
+          cell.appendChild(input);
+
+          const clueKey = `${i + 1};${j + 1}`;
+          if (clues[clueKey]) {
+            const clueNumber = document.createElement('div');
+            clueNumber.classList.add('cell-number');
+            clueNumber.textContent = clues[clueKey];
+            cell.appendChild(clueNumber);
+          }
         } else {
-          td.className = "empty";
+          cell.classList.add('inactive');
         }
-        tr.appendChild(td);
+        grid.appendChild(cell);
       });
-      table.appendChild(tr);
     });
 
     function checkAnswers() {
-      const inputs = table.querySelectorAll("input");
       let correct = true;
-      inputs.forEach(input => {
-        const row = input.dataset.row;
-        const col = input.dataset.col;
+      const cells = grid.querySelectorAll('.cell');
+      cells.forEach((cell, index) => {
+        const input = cell.querySelector('input');
+        if (!input) return;
+        const row = parseInt(input.dataset.row);
+        const col = parseInt(input.dataset.col);
         const expected = answers[row][col].toUpperCase();
-        const value = input.value.toUpperCase();
-        if (value !== expected) {
-          input.classList.add("error");
-          correct = false;
+        const typed = input.value.toUpperCase();
+        if (typed === expected) {
+          input.classList.remove('error');
         } else {
-          input.classList.remove("error");
+          input.classList.add('error');
+          correct = false;
         }
       });
-      const message = document.getElementById("message");
+
+      const msg = document.getElementById('message');
       if (correct) {
-        message.textContent = "Parabéns, você completou os joguinhos HD(Helena e Davi) especial dia dos namorados! Que nosso amor nunca deixe de ser divertido, obrigada por esses 6 meses 🌻 💛 \"A vida antes era um borrão, mas agr cm você eu vejo em HD\", Com amor Leninha.";
-        message.style.color = "green";
+        msg.innerHTML = `Parabéns, você completou os joguinhos HD (Helena e Davi) especial dia dos namorados! 💛<br>Que nosso amor nunca deixe de ser divertido, obrigada por esses 6 meses 🌻<br>"A vida antes era um borrão, mas agr cm você eu vejo em HD"<br>Com amor, Leninha.`;
+        msg.style.color = 'green';
       } else {
-        message.textContent = "Algumas respostas estão incorretas. Tente novamente!";
-        message.style.color = "red";
+        msg.textContent = 'Há alguns erros, revise suas respostas!';
+        msg.style.color = 'red';
       }
     }
   </script>
