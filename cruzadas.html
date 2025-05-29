@@ -3,162 +3,224 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cruzadinha do Amor 💛</title>
+  <title>Cruzadinha Especial</title>
   <style>
     body {
-      margin: 0;
-      padding: 20px;
       font-family: Arial, sans-serif;
       background-color: #fefefe;
       background-image: url('https://www.transparenttextures.com/patterns/white-wall-3.png');
       display: flex;
       flex-direction: column;
       align-items: center;
-      text-align: center;
+      justify-content: flex-start;
+      padding: 20px;
     }
     h1 {
       color: #f59e0b;
-      margin-bottom: 20px;
+      text-align: center;
     }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(20, 30px);
-      grid-auto-rows: 30px;
-      gap: 2px;
-      margin-bottom: 30px;
+    table {
+      border-collapse: collapse;
+      margin: 20px 0;
     }
-    .cell {
-      border: 1px solid #ccc;
+    td {
       width: 30px;
       height: 30px;
+      border: 1px solid #aaa;
       text-align: center;
-      font-size: 18px;
-      text-transform: uppercase;
+      vertical-align: middle;
+      padding: 0;
     }
-    .cell input {
+    input {
       width: 100%;
       height: 100%;
       border: none;
-      text-align: center;
-      font-size: 18px;
-      background: transparent;
       text-transform: uppercase;
+      text-align: center;
+      font-size: 16px;
+      background-color: #fff;
     }
-    .number {
-      position: absolute;
-      font-size: 10px;
-      top: 2px;
-      left: 2px;
+    input:focus {
+      outline: 2px solid #facc15;
     }
-    .clues {
-      text-align: left;
-      max-width: 600px;
+    .empty {
+      background-color: transparent;
+      border: none;
     }
-    .back-button {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      background: #fef3c7;
+    .error {
+      background-color: #fca5a5;
+    }
+    .hint-container {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 30px;
+      margin-top: 20px;
+      max-width: 1000px;
+    }
+    .hint-group {
+      flex: 1;
+      min-width: 300px;
+    }
+    .hint-group h3 {
+      margin-bottom: 10px;
       color: #92400e;
-      border: 2px solid #facc15;
-      padding: 10px 20px;
-      text-decoration: none;
-      font-weight: bold;
-      border-radius: 8px;
     }
-    .back-button:hover {
-      background-color: #fde68a;
+    .btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #fef3c7;
+      border: 2px solid #facc15;
+      border-radius: 8px;
+      color: #92400e;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .message {
+      margin-top: 20px;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <a href="index.html" class="back-button">← Voltar</a>
   <h1>Cruzadinha do Amor 💛</h1>
-  <div class="grid" id="crossword"></div>
+  <button class="btn" onclick="window.location.href='index.html'">⬅ Voltar</button>
+  <table id="grid"></table>
 
-  <div class="clues">
-    <h3>Verticais</h3>
-    <ol>
-      <li>Sorveteria</li>
-      <li>Primeiro encontro</li>
-      <li>Uma refeição</li>
-      <li>Sempre fazemos questão</li>
-      <li>Você odiava e está aprendendo a gostar</li>
-      <li>Primeiro mergulho no mar</li>
-      <li>Pretiin</li>
-      <li>Sempre tinha nos nossos primeiros encontros</li>
-      <li>Brancas e amarelas</li>
-      <li>Nossa sobremesa</li>
-      <li>Primeiro vício que te dei</li>
-    </ol>
+  <button class="btn" onclick="checkAnswers()">Verificar Respostas</button>
+  <div class="message" id="message"></div>
 
-    <h3>Horizontais</h3>
-    <ol>
-      <li>Passatempo</li>
-      <li>Uma cidade</li>
-      <li>Filmes</li>
-      <li>Era do ficante</li>
-      <li>Encaixa certinho</li>
-      <li>Sempre tem no bom dia</li>
-      <li>Seu perigo noturno</li>
-      <li>Atos de serviço preferido</li>
-    </ol>
+  <div class="hint-container">
+    <div class="hint-group">
+      <h3>Verticais</h3>
+      <ol>
+        <li>sorveteria</li>
+        <li>primeiro encontro</li>
+        <li>uma refeição</li>
+        <li>sempre fazemos questão</li>
+        <li>você odiava e está aprendendo a gostar</li>
+        <li>primeiro mergulho no mar</li>
+        <li>pretin</li>
+        <li>sempre tinha nos nossos primeiros encontros</li>
+        <li>brancas e amarelas</li>
+        <li>nossa sobremesa</li>
+        <li>primeiro vício que te dei</li>
+      </ol>
+    </div>
+    <div class="hint-group">
+      <h3>Horizontais</h3>
+      <ol>
+        <li>passatempo</li>
+        <li>uma cidade</li>
+        <li>filmes</li>
+        <li>era do ficante</li>
+        <li>encaixa certinho</li>
+        <li>sempre tem no bom dia</li>
+        <li>seu perigo noturno</li>
+        <li>atos de serviço preferido</li>
+      </ol>
+    </div>
   </div>
 
   <script>
-    const grid = document.getElementById("crossword");
+    const layout = `
+0000000010100000000
+0000000010100000000
+0000000010100000000
+0000000010100000000
+0000000010100000000
+0000001010100000000
+0111111111111000000
+0000001010000100000
+0000001000101111111
+0000001010100100001
+0000001010100100001
+0000101010100100101
+0000101111111110101
+0100101000000100101
+1111111111100111100
+0100101001000000100
+0100100011111100100
+0100000000100000000
+0100000111111000000
+0100000000100000000
+0100000111111111000
+0000000000100000000
+    `.trim().split("\n").map(row => row.split(""));
 
-    const structure = [
-      " 1 2          ",
-      " 3            ",
-      " 3            ",
-      " 3            ",
-      " 3 4 4 4 4 4 5 5 5 ",
-      "   6          ",
-      "   6 7        ",
-      "   6 7        ",
-      "   6 7 8 8 8 8 8 8 ",
-      " 9           11 ",
-      " 9 10 10 10 10 10 ",
-      "12           11 ",
-      "13 13 13     11 ",
-      "14           15 ",
-      "   16         15 ",
-      "   16         15 ",
-      "   16         15 ",
-      "   16         15 ",
-      "   17 17 17      ",
-      "     18         ",
-      "     18         ",
-      "     18         ",
-      "     18         ",
-      "        19 19 19 19 19 19 19 19 ",
-    ];
+    const answers = `
+0000000SORVETAO0000
+0000000G000Y0000000
+0000000Y000M0000000
+0000000M000D0000000
+0000000A000A0000000
+0000010T000T0000000
+QUEBRACABECAS000000
+000000E000000S00000
+000000I000FANIMACOES
+000000R000M000000AR
+000000A000I000000C
+0000SURPRESA0000A
+0000FEEEEEEEEE0M0O
+0C000A0000000000R0
+CUNHASPARATYDAVI000
+0H000I000D000000N00
+0I000000FILMES000D0
+0N0000000E000000000
+0H0000EMOJIS0000000
+0A0000000L000000000
+0M0000HAMILTON00000
+0000000A00000000000
+    `.trim().split("\n").map(r => r.split(""));
 
-    for (let row of structure) {
-      for (let char of row.padEnd(20)) {
-        if (char.trim()) {
-          const cell = document.createElement("div");
-          cell.className = "cell";
+    const table = document.getElementById("grid");
+    layout.forEach((row, i) => {
+      const tr = document.createElement("tr");
+      row.forEach((cell, j) => {
+        const td = document.createElement("td");
+        if (cell === "1") {
           const input = document.createElement("input");
           input.maxLength = 1;
+          input.dataset.row = i;
+          input.dataset.col = j;
           input.addEventListener("input", (e) => {
-            if (e.target.value.length === 1) {
-              const inputs = Array.from(document.querySelectorAll(".cell input"));
-              const index = inputs.indexOf(e.target);
-              if (index >= 0 && index < inputs.length - 1) {
-                inputs[index + 1].focus();
-              }
+            e.target.value = e.target.value.toUpperCase();
+            const next = e.target.nextElementSibling;
+            if (next && next.tagName === 'INPUT') {
+              next.focus();
             }
           });
-          cell.appendChild(input);
-          grid.appendChild(cell);
+          td.appendChild(input);
         } else {
-          const empty = document.createElement("div");
-          empty.style.width = "30px";
-          empty.style.height = "30px";
-          grid.appendChild(empty);
+          td.className = "empty";
         }
+        tr.appendChild(td);
+      });
+      table.appendChild(tr);
+    });
+
+    function checkAnswers() {
+      const inputs = table.querySelectorAll("input");
+      let correct = true;
+      inputs.forEach(input => {
+        const row = input.dataset.row;
+        const col = input.dataset.col;
+        const expected = answers[row][col].toUpperCase();
+        const value = input.value.toUpperCase();
+        if (value !== expected) {
+          input.classList.add("error");
+          correct = false;
+        } else {
+          input.classList.remove("error");
+        }
+      });
+      const message = document.getElementById("message");
+      if (correct) {
+        message.textContent = "Parabéns, você completou os joguinhos HD(Helena e Davi) especial dia dos namorados! Que nosso amor nunca deixe de ser divertido, obrigada por esses 6 meses 🌻 💛 \"A vida antes era um borrão, mas agr cm você eu vejo em HD\", Com amor Leninha.";
+        message.style.color = "green";
+      } else {
+        message.textContent = "Algumas respostas estão incorretas. Tente novamente!";
+        message.style.color = "red";
       }
     }
   </script>
