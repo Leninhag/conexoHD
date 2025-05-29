@@ -3,66 +3,77 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cruzadinha do Amor</title>
+  <title>Cruzadinha do Amor 💛</title>
   <style>
     body {
+      margin: 0;
+      padding: 20px;
       font-family: Arial, sans-serif;
       background-color: #fefefe;
       background-image: url('https://www.transparenttextures.com/patterns/white-wall-3.png');
-      margin: 0;
-      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       text-align: center;
     }
     h1 {
       color: #f59e0b;
+      margin-bottom: 20px;
     }
     .grid {
       display: grid;
       grid-template-columns: repeat(20, 30px);
-      justify-content: center;
+      grid-auto-rows: 30px;
       gap: 2px;
-      margin: 20px 0;
+      margin-bottom: 30px;
     }
-    input {
+    .cell {
+      border: 1px solid #ccc;
       width: 30px;
       height: 30px;
-      text-transform: uppercase;
       text-align: center;
-      font-size: 16px;
+      font-size: 18px;
+      text-transform: uppercase;
     }
-    .black {
-      background-color: black;
-      pointer-events: none;
+    .cell input {
+      width: 100%;
+      height: 100%;
+      border: none;
+      text-align: center;
+      font-size: 18px;
+      background: transparent;
+      text-transform: uppercase;
+    }
+    .number {
+      position: absolute;
+      font-size: 10px;
+      top: 2px;
+      left: 2px;
     }
     .clues {
-      max-width: 600px;
-      margin: 0 auto;
       text-align: left;
+      max-width: 600px;
     }
-    .clues h3 {
-      margin-top: 20px;
-    }
-    .back-btn {
-      margin-top: 20px;
-    }
-    .btn {
-      padding: 10px 20px;
-      font-size: 1rem;
-      background-color: #fef3c7;
-      border: 2px solid #facc15;
-      border-radius: 8px;
+    .back-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: #fef3c7;
       color: #92400e;
+      border: 2px solid #facc15;
+      padding: 10px 20px;
       text-decoration: none;
       font-weight: bold;
+      border-radius: 8px;
     }
-    .btn:hover {
+    .back-button:hover {
       background-color: #fde68a;
     }
   </style>
 </head>
 <body>
+  <a href="index.html" class="back-button">← Voltar</a>
   <h1>Cruzadinha do Amor 💛</h1>
-
   <div class="grid" id="crossword"></div>
 
   <div class="clues">
@@ -74,12 +85,13 @@
       <li>Sempre fazemos questão</li>
       <li>Você odiava e está aprendendo a gostar</li>
       <li>Primeiro mergulho no mar</li>
-      <li>PretiN</li>
+      <li>Pretiin</li>
       <li>Sempre tinha nos nossos primeiros encontros</li>
       <li>Brancas e amarelas</li>
       <li>Nossa sobremesa</li>
       <li>Primeiro vício que te dei</li>
     </ol>
+
     <h3>Horizontais</h3>
     <ol>
       <li>Passatempo</li>
@@ -93,40 +105,62 @@
     </ol>
   </div>
 
-  <div class="back-btn">
-    <a class="btn" href="index.html">Voltar</a>
-  </div>
-
   <script>
-    const gridLayout = [
-      // 20x20 grid layout, 0 = empty, 1 = input, 2 = black box
-      // For brevity, we'll create a simplified crossword layout
-      // Replace with real layout when known
-      "00000000000000000000",
-      "00000000111110000000",
-      "00001111100000111100",
-      "00001000100010000100",
-      "00001111100111111100",
-      "00000000100010000100",
-      "00111111111110000000",
-      "00100010000010000000",
-      "11111111100001111100",
-      "00001000000000000100",
-      "00001111111111111100",
-      "00000000000000000000"
+    const grid = document.getElementById("crossword");
+
+    const structure = [
+      " 1 2          ",
+      " 3            ",
+      " 3            ",
+      " 3            ",
+      " 3 4 4 4 4 4 5 5 5 ",
+      "   6          ",
+      "   6 7        ",
+      "   6 7        ",
+      "   6 7 8 8 8 8 8 8 ",
+      " 9           11 ",
+      " 9 10 10 10 10 10 ",
+      "12           11 ",
+      "13 13 13     11 ",
+      "14           15 ",
+      "   16         15 ",
+      "   16         15 ",
+      "   16         15 ",
+      "   16         15 ",
+      "   17 17 17      ",
+      "     18         ",
+      "     18         ",
+      "     18         ",
+      "     18         ",
+      "        19 19 19 19 19 19 19 19 ",
     ];
 
-    const crossword = document.getElementById("crossword");
-    gridLayout.forEach(row => {
-      [...row].forEach(cell => {
-        const input = document.createElement("input");
-        if (cell === "0") {
-          input.className = "black";
-          input.disabled = true;
+    for (let row of structure) {
+      for (let char of row.padEnd(20)) {
+        if (char.trim()) {
+          const cell = document.createElement("div");
+          cell.className = "cell";
+          const input = document.createElement("input");
+          input.maxLength = 1;
+          input.addEventListener("input", (e) => {
+            if (e.target.value.length === 1) {
+              const inputs = Array.from(document.querySelectorAll(".cell input"));
+              const index = inputs.indexOf(e.target);
+              if (index >= 0 && index < inputs.length - 1) {
+                inputs[index + 1].focus();
+              }
+            }
+          });
+          cell.appendChild(input);
+          grid.appendChild(cell);
+        } else {
+          const empty = document.createElement("div");
+          empty.style.width = "30px";
+          empty.style.height = "30px";
+          grid.appendChild(empty);
         }
-        crossword.appendChild(input);
-      });
-    });
+      }
+    }
   </script>
 </body>
 </html>
