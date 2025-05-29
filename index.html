@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #fffbe6;
+      background: #fffdf7; /* cor quase branca */
       margin: 0;
       padding: 20px;
       display: flex;
@@ -20,7 +20,7 @@
     }
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      grid-template-columns: repeat(4, 1fr); /* sempre 4 por linha */
       gap: 10px;
       margin-top: 20px;
       width: 100%;
@@ -29,8 +29,10 @@
     .word {
       background-color: #fef3c7;
       border: 2px solid #fcd34d;
-      padding: 10px;
-      text-align: center;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
       border-radius: 8px;
       font-size: 16px;
@@ -84,10 +86,15 @@
       text-align: center;
       font-weight: bold;
     }
+    @media (max-width: 500px) {
+      .grid {
+        grid-template-columns: repeat(4, 1fr); /* mantém 4 por linha no mobile */
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>Connections – Dia dos namorados 💛</h1>
+  <h1>Connections – Versão do Amor 💛</h1>
   <div class="grid" id="grid"></div>
   <button onclick="checkConnection()">Verificar Seleção</button>
   <div class="result" id="result"></div>
@@ -95,109 +102,96 @@
   <div class="found-groups" id="foundGroups"></div>
   <div class="final-message" id="finalMessage"></div>
 
- <script>
-  const grupos = [
-    ["Paraty", "Cunha", "Feira", "Sorvetão"],
-    ["Hamilton", "Quebra-cabeças", "Cozinhar", "Animações"],
-    ["Flores", "Mini presentes", "Planejar dates", "Emojis"],
-    ["Amor", "Diálogo", "Cuidado", "Construção"]
-  ];
+  <script>
+    const grupos = [
+      { tema: "Lugares", palavras: ["Paraty", "Cunha", "Feira", "Sorvetão"] },
+      { tema: "Em casa", palavras: ["Hamilton", "Quebra-cabeças", "Cozinhar", "Animações"] },
+      { tema: "Fofuras", palavras: ["Flores", "Mini presentes", "Planejar dates", "Emojis"] },
+      { tema: "Cultura", palavras: ["Amor", "Diálogo", "Cuidado", "Construção"] }
+    ];
 
-  let todasPalavras = grupos.flat().slice(); // cópia real do array
-  shuffle(todasPalavras);
+    const todasPalavras = grupos.flatMap(g => g.palavras);
 
-  const grid = document.getElementById('grid');
-  const selectedWords = new Set();
-  const foundGroups = [];
-  let attempts = 0;
-
-  // Embaralhador
-  function shuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
     }
-  }
 
-  // Monta grade de palavras
-  todasPalavras.forEach(wordText => {
-    const wordEl = document.createElement('div');
-    wordEl.className = 'word';
-    wordEl.textContent = wordText;
-    wordEl.addEventListener('click', () => {
-      if (wordEl.classList.contains('found')) return;
-      wordEl.classList.toggle('selected');
-      if (selectedWords.has(wordText)) {
-        selectedWords.delete(wordText);
+    shuffle(todasPalavras);
+
+    const grid = document.getElementById('grid');
+    const selectedWords = new Set();
+    const foundGroups = [];
+    let attempts = 0;
+
+    todasPalavras.forEach(wordText => {
+      const wordEl = document.createElement('div');
+      wordEl.className = 'word';
+      wordEl.textContent = wordText;
+      wordEl.addEventListener('click', () => {
+        if (wordEl.classList.contains('found')) return;
+        wordEl.classList.toggle('selected');
+        if (selectedWords.has(wordText)) {
+          selectedWords.delete(wordText);
+        } else {
+          selectedWords.add(wordText);
+        }
+      });
+      grid.appendChild(wordEl);
+    });
+
+    function checkConnection() {
+      if (selectedWords.size !== 4) {
+        document.getElementById('result').textContent = "Selecione exatamente 4 palavras.";
+        return;
+      }
+
+      const selection = Array.from(selectedWords);
+      let groupFound = null;
+
+      grupos.forEach(group => {
+        if (group.palavras.every(word => selection.includes(word))) {
+          groupFound = group;
+        }
+      });
+
+      attempts++;
+      document.getElementById('attempts').textContent = `Tentativas: ${attempts}`;
+
+      if (groupFound && !foundGroups.includes(groupFound.tema)) {
+        foundGroups.push(groupFound.tema);
+        highlightGroup(groupFound.palavras);
+        document.getElementById('result').textContent = `Você encontrou o grupo "${groupFound.tema}" 💕`;
       } else {
-        selectedWords.add(wordText);
+        document.getElementById('result').textContent = "Hmm... esse grupo não está certo ainda. Tente novamente!";
       }
-    });
-    grid.appendChild(wordEl);
-  });
 
-  function checkConnection() {
-    const resultEl = document.getElementById('result');
-    const attemptsEl = document.getElementById('attempts');
+      selectedWords.clear();
+      document.querySelectorAll('.word').forEach(w => w.classList.remove('selected'));
 
-    if (selectedWords.size !== 4) {
-      resultEl.textContent = "Selecione exatamente 4 palavras.";
-      return;
-    }
-
-    const selection = Array.from(selectedWords);
-    const selectionSorted = [...selection].sort();
-
-    let groupFound = null;
-
-    for (const group of grupos) {
-      const sortedGroup = [...group].sort();
-      const isSameGroup = JSON.stringify(sortedGroup) === JSON.stringify(selectionSorted);
-
-      if (isSameGroup && !foundGroups.some(g => JSON.stringify([...g].sort()) === JSON.stringify(selectionSorted))) {
-        groupFound = group;
-        break;
+      if (foundGroups.length === grupos.length) {
+        document.getElementById('finalMessage').textContent =
+          "Feliz dia dos namorados! Amo você meu benzinho 💛 Lena";
       }
     }
 
-    attempts++;
-    attemptsEl.textContent = `Tentativas: ${attempts}`;
+    function highlightGroup(group) {
+      const groupDiv = document.createElement('div');
+      groupDiv.classList.add('found-group');
+      group.forEach(wordText => {
+        const wordEl = Array.from(document.querySelectorAll('.word')).find(el => el.textContent === wordText);
+        if (wordEl) wordEl.classList.add('found');
 
-    if (groupFound) {
-      foundGroups.push(groupFound);
-      highlightGroup(groupFound);
-      resultEl.textContent = "Você encontrou um grupo correto! 💕";
-    } else {
-      resultEl.textContent = "Hmm... esse grupo não está certo ainda. Tente novamente!";
+        const clone = document.createElement('div');
+        clone.className = 'word';
+        clone.textContent = wordText;
+        groupDiv.appendChild(clone);
+      });
+      const container = document.getElementById('foundGroups');
+      container.insertBefore(groupDiv, container.firstChild);
     }
-
-    selectedWords.clear();
-    document.querySelectorAll('.word').forEach(w => w.classList.remove('selected'));
-
-    if (foundGroups.length === grupos.length) {
-      document.getElementById('finalMessage').textContent =
-        "Feliz dia dos namorados! Amo você meu benzinho 💛 Lena";
-    }
-  }
-
-  function highlightGroup(group) {
-    const groupDiv = document.createElement('div');
-    groupDiv.classList.add('found-group');
-
-    group.forEach(wordText => {
-      const wordEl = Array.from(document.querySelectorAll('.word')).find(el => el.textContent === wordText);
-      if (wordEl) wordEl.classList.add('found');
-
-      const clone = document.createElement('div');
-      clone.className = 'word';
-      clone.textContent = wordText;
-      groupDiv.appendChild(clone);
-    });
-
-    const container = document.getElementById('foundGroups');
-    container.insertBefore(groupDiv, container.firstChild);
-  }
-</script>
-
+  </script>
 </body>
 </html>
