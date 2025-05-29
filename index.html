@@ -3,195 +3,67 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Connections do Amor</title>
+  <title>Feliz Dia dos Namorados</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #fffdf7; /* cor quase branca */
       margin: 0;
-      padding: 20px;
+      font-family: Arial, sans-serif;
+      background-color: #fefefe;
+      background-image: url('https://www.transparenttextures.com/patterns/white-wall-3.png');
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      padding: 20px;
     }
     h1 {
-      color: #d97706;
-      text-align: center;
+      font-size: 2.2rem;
+      color: #f59e0b;
+      margin-bottom: 40px;
     }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr); /* sempre 4 por linha */
-      gap: 10px;
-      margin-top: 20px;
+    .flower-background {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
-      max-width: 600px;
+      height: 100%;
+      z-index: -1;
+      background-image: url('https://i.imgur.com/x8VMo7m.png'); /* imagem com girassóis, lírios e margaridas */
+      background-repeat: repeat;
+      background-size: cover;
+      opacity: 0.1;
     }
-    .word {
-      background-color: #fef3c7;
-      border: 2px solid #fcd34d;
-      height: 60px;
+    .button-container {
       display: flex;
-      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
       justify-content: center;
-      cursor: pointer;
+    }
+    .btn {
+      padding: 15px 30px;
+      font-size: 1rem;
+      background-color: #fef3c7;
+      border: 2px solid #facc15;
       border-radius: 8px;
-      font-size: 16px;
+      color: #92400e;
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: bold;
       transition: background 0.3s;
     }
-    .word.selected {
+    .btn:hover {
       background-color: #fde68a;
-    }
-    .word.found {
-      background-color: #bbf7d0;
-      border-color: #34d399;
-      pointer-events: none;
-    }
-    button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #facc15;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .result {
-      margin-top: 20px;
-      font-size: 18px;
-      color: #10b981;
-      text-align: center;
-    }
-    .found-groups {
-      margin-top: 30px;
-      width: 100%;
-      max-width: 600px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .found-group {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .found-group .word {
-      background-color: #bbf7d0;
-      border-color: #34d399;
-    }
-    .final-message {
-      margin-top: 40px;
-      font-size: 22px;
-      color: #dc2626;
-      text-align: center;
-      font-weight: bold;
-    }
-    @media (max-width: 500px) {
-      .grid {
-        grid-template-columns: repeat(4, 1fr); /* mantém 4 por linha no mobile */
-      }
     }
   </style>
 </head>
 <body>
-  <h1>Connections – Versão do Amor 💛</h1>
-  <div class="grid" id="grid"></div>
-  <button onclick="checkConnection()">Verificar Seleção</button>
-  <div class="result" id="result"></div>
-  <div class="result" id="attempts"></div>
-  <div class="found-groups" id="foundGroups"></div>
-  <div class="final-message" id="finalMessage"></div>
-
-  <script>
-    const grupos = [
-      { tema: "Lugares", palavras: ["Paraty", "Cunha", "Feira", "Sorvetão"] },
-      { tema: "Em casa", palavras: ["Hamilton", "Quebra-cabeças", "Cozinhar", "Animações"] },
-      { tema: "Fofuras", palavras: ["Flores", "Mini presentes", "Planejar dates", "Emojis"] },
-      { tema: "Cultura", palavras: ["Amor", "Diálogo", "Cuidado", "Construção"] }
-    ];
-
-    const todasPalavras = grupos.flatMap(g => g.palavras);
-
-    function shuffle(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-    }
-
-    shuffle(todasPalavras);
-
-    const grid = document.getElementById('grid');
-    const selectedWords = new Set();
-    const foundGroups = [];
-    let attempts = 0;
-
-    todasPalavras.forEach(wordText => {
-      const wordEl = document.createElement('div');
-      wordEl.className = 'word';
-      wordEl.textContent = wordText;
-      wordEl.addEventListener('click', () => {
-        if (wordEl.classList.contains('found')) return;
-        wordEl.classList.toggle('selected');
-        if (selectedWords.has(wordText)) {
-          selectedWords.delete(wordText);
-        } else {
-          selectedWords.add(wordText);
-        }
-      });
-      grid.appendChild(wordEl);
-    });
-
-    function checkConnection() {
-      if (selectedWords.size !== 4) {
-        document.getElementById('result').textContent = "Selecione exatamente 4 palavras.";
-        return;
-      }
-
-      const selection = Array.from(selectedWords);
-      let groupFound = null;
-
-      grupos.forEach(group => {
-        if (group.palavras.every(word => selection.includes(word))) {
-          groupFound = group;
-        }
-      });
-
-      attempts++;
-      document.getElementById('attempts').textContent = `Tentativas: ${attempts}`;
-
-      if (groupFound && !foundGroups.includes(groupFound.tema)) {
-        foundGroups.push(groupFound.tema);
-        highlightGroup(groupFound.palavras);
-        document.getElementById('result').textContent = `Você encontrou o grupo "${groupFound.tema}" 💕`;
-      } else {
-        document.getElementById('result').textContent = "Hmm... esse grupo não está certo ainda. Tente novamente!";
-      }
-
-      selectedWords.clear();
-      document.querySelectorAll('.word').forEach(w => w.classList.remove('selected'));
-
-      if (foundGroups.length === grupos.length) {
-        document.getElementById('finalMessage').textContent =
-          "Feliz dia dos namorados! Amo você meu benzinho 💛 Lena";
-      }
-    }
-
-    function highlightGroup(group) {
-      const groupDiv = document.createElement('div');
-      groupDiv.classList.add('found-group');
-      group.forEach(wordText => {
-        const wordEl = Array.from(document.querySelectorAll('.word')).find(el => el.textContent === wordText);
-        if (wordEl) wordEl.classList.add('found');
-
-        const clone = document.createElement('div');
-        clone.className = 'word';
-        clone.textContent = wordText;
-        groupDiv.appendChild(clone);
-      });
-      const container = document.getElementById('foundGroups');
-      container.insertBefore(groupDiv, container.firstChild);
-    }
-  </script>
+  <div class="flower-background"></div>
+  <h1>Feliz dia dos namorados 🌻💞</h1>
+  <div class="button-container">
+    <a class="btn" href="conexo.html">Conexo</a>
+    <a class="btn" href="cruzadas.html">Cruzadas</a>
+  </div>
 </body>
 </html>
