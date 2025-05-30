@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="pt-br">
+<!DOCTYPE html><html lang="pt-br">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,6 +11,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: flex-start;
       padding: 20px;
     }
     h1 {
@@ -25,10 +25,7 @@
     td {
       width: 30px;
       height: 30px;
-      border: 1px solid #888;
-      text-align: center;
-      vertical-align: top;
-      padding: 0;
+      border: 1px solid #999;
       position: relative;
     }
     input {
@@ -39,7 +36,6 @@
       text-align: center;
       font-size: 16px;
       background-color: #fff;
-      outline: none;
     }
     input:focus {
       outline: 2px solid #facc15;
@@ -56,7 +52,23 @@
       top: 0;
       left: 2px;
       font-size: 10px;
-      color: #444;
+      color: #333;
+    }
+    .hint-container {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 30px;
+      margin-top: 20px;
+      max-width: 1000px;
+    }
+    .hint-group {
+      flex: 1;
+      min-width: 300px;
+    }
+    .hint-group h3 {
+      margin-bottom: 10px;
+      color: #92400e;
     }
     .btn {
       margin-top: 20px;
@@ -78,12 +90,39 @@
   <h1>Cruzadinha do Amor 💛</h1>
   <button class="btn" onclick="window.location.href='index.html'">⬅ Voltar</button>
   <table id="grid"></table>
-
   <button class="btn" onclick="checkAnswers()">Verificar Respostas</button>
-  <div class="message" id="message"></div>
-
-  <script>
-    const layout = `
+  <div class="message" id="message"></div>  <div class="hint-container">
+    <div class="hint-group">
+      <h3>Verticais</h3>
+      <ol>
+        <li>sorveteria</li>
+        <li>primeiro encontro</li>
+        <li>uma refeição</li>
+        <li>sempre fazemos questão</li>
+        <li>você odiava e está aprendendo a gostar</li>
+        <li>primeiro mergulho no mar</li>
+        <li>pretin</li>
+        <li>sempre tinha nos nossos primeiros encontros</li>
+        <li>brancas e amarelas</li>
+        <li>nossa sobremesa</li>
+        <li>primeiro vício que te dei</li>
+      </ol>
+    </div>
+    <div class="hint-group">
+      <h3>Horizontais</h3>
+      <ol>
+        <li>passatempo</li>
+        <li>uma cidade</li>
+        <li>filmes</li>
+        <li>era do ficante</li>
+        <li>encaixa certinho</li>
+        <li>sempre tem no bom dia</li>
+        <li>seu perigo noturno</li>
+        <li>atos de serviço preferido</li>
+      </ol>
+    </div>
+  </div><script>
+const layout = `
 0000000010100000000
 0000000010100000000
 0000000010100000000
@@ -106,9 +145,9 @@
 0100000000100000000
 0100000111111111000
 0000000000100000000
-    `.trim().split("\n").map(row => row.split(""));
+`.trim().split("\n").map(r => r.split(""));
 
-    const answers = `
+const answers = `
 00000000s0g000000000000
 00000000o0y000000000000
 00000000r0m000000000000
@@ -121,7 +160,7 @@
 000000d0d0e000r0000a00
 000000a0a0i000p0000r00
 000m0m0v0r000r00f0a000
-000u0animacoes0l0t0000
+000u0animaçoes0l0t0000
 s00s0n0000000s00o0y000
 mochilhinha00amor00000
 0r00c0a00a000000e00000
@@ -129,65 +168,63 @@ v00a000emojiss00s00000
 e0000000000i0000000000
 0t0000helen00000000000
 0e000000000t0000000000
-    `.trim().split("\n").map(row => row.split(""));
+`.trim().split("\n").map(r => r.split(""));
 
-    const numbers = [
-      [1,9,1],[1,11,2],[6,7,3],[7,2,4],[8,14,5],[9,11,6],[9,13,7],[9,19,8],
-      [10,9,9],[12,5,10],[12,17,11],[13,7,12],[14,2,13],[15,1,14],[15,10,15],
-      [15,14,16],[17,9,17],[19,8,18],[21,9,19]
-    ];
+const clues = {
+  "1;9": 1, "1;11": 2, "6;7": 3, "7;2": 4, "8;14": 5, "9;11": 6,
+  "9;13": 7, "9;19": 8, "10;9": 9, "12;5": 10, "12;17": 11, "13;7": 12,
+  "14;2": 13, "15;1": 14, "15;10": 15, "15;14": 16, "17;9": 17,
+  "19;8": 18, "21;9": 19
+};
 
-    const table = document.getElementById("grid");
+const table = document.getElementById("grid");
+const inputsMap = {};
+layout.forEach((row, i) => {
+  const tr = document.createElement("tr");
+  row.forEach((cell, j) => {
+    const td = document.createElement("td");
+    if (cell === "1") {
+      const input = document.createElement("input");
+      input.maxLength = 1;
+      input.dataset.row = i;
+      input.dataset.col = j;
+      input.id = `cell-${i}-${j}`;
+      inputsMap[`${i},${j}`] = input;
 
-    layout.forEach((row, i) => {
-      const tr = document.createElement("tr");
-      row.forEach((cell, j) => {
-        const td = document.createElement("td");
-        if (cell === "1") {
-          const input = document.createElement("input");
-          input.maxLength = 1;
-          input.dataset.row = i;
-          input.dataset.col = j;
-          input.addEventListener("input", (e) => {
-            e.target.value = e.target.value.toUpperCase();
-            moveToNextInput(i, j);
-          });
-          td.appendChild(input);
-        } else {
-          td.className = "empty";
-        }
-        const num = numbers.find(n => n[0] === i && n[1] === j);
-        if (num) {
-          const span = document.createElement("span");
-          span.textContent = num[2];
-          span.className = "number";
-          td.appendChild(span);
-        }
-        tr.appendChild(td);
+      input.addEventListener("input", (e) => {
+        e.target.value = e.target.value.toUpperCase();
+        moveToNext(i, j);
       });
-      table.appendChild(tr);
-    });
+      td.appendChild(input);
 
-    function moveToNextInput(row, col) {
-      const inputs = table.querySelectorAll("input");
-      const current = Array.from(inputs).find(i => +i.dataset.row === row && +i.dataset.col === col);
-      let found = false;
-      for (const input of inputs) {
-        if (found && !input.value) {
-          input.focus();
-          return;
-        }
-        if (input === current) found = true;
+      if (clues[`${i + 1};${j + 1}`]) {
+        const num = document.createElement("div");
+        num.className = "number";
+        num.textContent = clues[`${i + 1};${j + 1}`];
+        td.appendChild(num);
       }
+    } else {
+      td.className = "empty";
     }
+    tr.appendChild(td);
+  });
+  table.appendChild(tr);
+});
 
-    function checkAnswers() {
-      const inputs = table.querySelectorAll("input");
-      let correct = true;
-      inputs.forEach(input => {
-        const row = +input.dataset.row;
-        const col = +input.dataset.col;
-        const expected = answers[row][col].toUpperCase();
+function moveToNext(i, j) {
+  const horizontal = inputsMap[`${i},${j+1}`];
+  const vertical = inputsMap[`${i+1},${j}`];
+  if (horizontal) horizontal.focus();
+  else if (vertical) vertical.focus();
+}
+
+function checkAnswers() {
+  let correct = true;
+  for (let i = 0; i < layout.length; i++) {
+    for (let j = 0; j < layout[i].length; j++) {
+      if (layout[i][j] === "1") {
+        const input = document.getElementById(`cell-${i}-${j}`);
+        const expected = answers[i][j].toUpperCase();
         const value = input.value.toUpperCase();
         if (value !== expected) {
           input.classList.add("error");
@@ -195,16 +232,18 @@ e0000000000i0000000000
         } else {
           input.classList.remove("error");
         }
-      });
-      const message = document.getElementById("message");
-      if (correct) {
-        message.textContent = "Parabéns, você completou os joguinhos HD(Helena e Davi) especial dia dos namorados! Que nosso amor nunca deixe de ser divertido, obrigada por esses 6 meses 🌻 💛 'A vida antes era um borrão, mas agr cm você eu vejo em HD', Com amor Leninha.";
-        message.style.color = "green";
-      } else {
-        message.textContent = "Algumas respostas estão incorretas. Tente novamente!";
-        message.style.color = "red";
       }
     }
-  </script>
-</body>
+  }
+  const message = document.getElementById("message");
+  if (correct) {
+    message.textContent = "Parabéns, você completou os joguinhos HD(Helena e Davi) especial dia dos namorados! Que nosso amor nunca deixe de ser divertido, obrigada por esses 6 meses 🌻 💛 \"A vida antes era um borrão, mas agr cm você eu vejo em HD\", Com amor Leninha.";
+    message.style.color = "green";
+  } else {
+    message.textContent = "Algumas respostas estão incorretas. Tente novamente!";
+    message.style.color = "red";
+  }
+}
+</script></body>
 </html>
+
